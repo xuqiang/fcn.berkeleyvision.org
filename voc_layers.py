@@ -162,8 +162,10 @@ class SBDDSegDataLayer(caffe.Layer):
             raise Exception("Do not define a bottom.")
 
         # load indices for images and labels
-        split_f  = '{}/{}.txt'.format(self.sbdd_dir,
+        split_f  = '{}/ImageSets/Segmentation/{}.txt'.format(self.sbdd_dir,
                 self.split)
+        #split_f  = '{}/{}.txt'.format(self.sbdd_dir,
+        #        self.split)
         self.indices = open(split_f, 'r').read().splitlines()
         self.idx = 0
 
@@ -212,7 +214,8 @@ class SBDDSegDataLayer(caffe.Layer):
         - subtract mean
         - transpose to channel x height x width order
         """
-        im = Image.open('{}/img/{}.jpg'.format(self.sbdd_dir, idx))
+        im = Image.open('{}/JPEGImages/{}.jpg'.format(self.sbdd_dir, idx))
+        #im = Image.open('{}/img/{}.jpg'.format(self.sbdd_dir, idx))
         in_ = np.array(im, dtype=np.float32)
         in_ = in_[:,:,::-1]
         in_ -= self.mean
@@ -226,7 +229,10 @@ class SBDDSegDataLayer(caffe.Layer):
         The leading singleton dimension is required by the loss.
         """
         import scipy.io
-        mat = scipy.io.loadmat('{}/cls/{}.mat'.format(self.sbdd_dir, idx))
-        label = mat['GTcls'][0]['Segmentation'][0].astype(np.uint8)
+        im = Image.open('{}/SegmentationClass/{}.png'.format(self.sbdd_dir, idx))
+        #im = Image.open('{}/img/{}.jpg'.format(self.sbdd_dir, idx))
+        #mat = scipy.io.loadmat('{}/cls/{}.mat'.format(self.sbdd_dir, idx))
+        #label = mat['GTcls'][0]['Segmentation'][0].astype(np.uint8)
+        label = np.array(im, dtype=np.float32)
         label = label[np.newaxis, ...]
         return label
